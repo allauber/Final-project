@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decision Making Task</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f4f4f9; }
+        .container { text-align: center; background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 600px; width: 90%; position: relative; }
+        .hidden { display: none; }
+        
+        /* Task Screen Specifics */
+        #money-display { position: absolute; top: 10px; right: 20px; font-weight: bold; font-size: 1.2rem; color: green; }
+        #trial-counter { position: absolute; top: 10px; left: 20px; font-size: 0.9rem; color: #666; }
+        .box-container { display: flex; justify-content: space-around; margin-top: 50px; }
+        .choice-box { width: 200px; height: 150px; display: flex; align-items: center; justify-content: center; border: 2px solid #333; border-radius: 8px; cursor: pointer; transition: transform 0.2s; background: #e0e0e0; font-weight: bold; padding: 10px; }
+        .choice-box:hover { transform: scale(1.05); background: #d0d0d0; }
+        
+        button { padding: 10px 20px; font-size: 1rem; cursor: pointer; border-radius: 5px; border: none; background: #007bff; color: white; margin-top: 20px; }
+        input, select { padding: 8px; margin: 10px; width: 80%; }
+    </style>
+</head>
+<body>
+
+    <div id="screen1" class="container">
+        <h1>Welcome</h1>
+        <input type="text" id="participantID" placeholder="Participant ID (Leave blank for random)">
+        <select id="gender">
+            <option value="" disabled selected>Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+            <option value="Prefer not to say">Prefer not to say</option>
+        </select>
+        <br>
+        <button onclick="startTask()">Start Task</button>
+    </div>
+
+    <div id="screen2" class="container hidden">
+        <h2>Instructions</h2>
+        <p>You are about to complete a decision making task and you start with $100. In this task there will be 2 options, one with a known probability, and another with an unknown probability of winning. This unknown probability may have better or worse odds of receiving the reward.</p>
+        <p>If you win, your money will double. If you lose, your money will be cut in half. The goal at the end of this task is to have as much money as possible.</p>
+        <button onclick="showTask()">Continue</button>
+    </div>
+
+    <div id="screen3" class="container hidden">
+        <div id="trial-counter">Trial: <span id="current-trial">1</span> / 30</div>
+        <div id="money-display">Balance: $<span id="balance">100</span></div>
+        <div class="box-container">
+            <div id="known-box" class="choice-box" onclick="makeChoice('known')">
+                The probability of doubling your money: <span id="prob-display">70</span>%
+            </div>
+            <div id="ambig-box" class="choice-box" onclick="makeChoice('ambig')">
+                The probability of doubling your money: Unknown
+            </div>
+        </div>
+        <p id="feedback" style="margin-top: 20px; font-weight: bold;"></p>
+    </div>
+
+    <div id="screen4" class="container hidden">
+        <h2>Task Complete</h2>
+        <p>Your data is being saved...</p>
+        <p id="final-balance"></p>
+    </div>
+
+    <script>
+        let config = {
+            participantID: "",
+            gender: "",
+            balance: 100,
+            trial: 1,
+            maxTrials: 30,
+            knownProb: 70,
+            ambigProb: 60, // Secret prob
+            knownClickCount: 0,
+            dataLog: [],
+            apiUrl: "https://script.google.com/macros/s/AKfycbxQn-tNA8dwEJEo9rWjBT5SYbGtdkc78_8LuEZ6EkPJSCX--4xKeN536_MH-XPKMnrlaQ/exec"
+        };
+
+        function startTask() {
+            let idInput = document.getElementById('participantID').value;
+            config.participantID = idInput || "ID_" + Math.random().toString(36).substr(2, 6).toUpperCase();
+            config.gender = document.getElementById('gender').value || "Not Specified";
+            
+            document.getElementById('screen1').classList.add('hidden');
+            document.getElementById('screen2').classList.remove('hidden');
+        }
+
+        function showTask() {
+            document.getElementById('screen2').classList.add('hidden');
+            document.getElementById('screen3').classList.remove('hidden');
+        }
+
+        function makeChoice(type) {
+            if (config.trial > config.maxTrials) return;
+
+            let winRate = (type === 'known') ? config.knownProb : config.ambigProb;
+            let didWin = (Math.random() * 100) < winRate;
+            let choiceAmbig = (type === 'ambig') ? 1 : 0;
+            let currentKnownVal = config.knownProb;
+
+            // Update Money
+            if (didWin) {
+                config.balance *= 2;
+                document.getElementById('feedback').innerText = "Result: Win! Money Doubled.";
+                document.getElementById('feedback').style.color = "green";
+            } else {
+                config.balance /= 2;
+                document.getElementById('feedback').innerText = "Result: Loss! Money Halved.";
+                document.getElementById('feedback').style.color = "red";
+            }
+
+            // Record Data
+            config.dataLog.push({
+                Participant_ID: config.participantID,
+                Trial_Number: config.trial,
+                Ambiguous: choiceAmbig,
+                Risk: currentKnownVal,
+                Gender: config.gender
+            });
+
+            // If known was clicked, update the counter and check for decay
+            if (type === 'known') {
+                config.knownClickCount++;
+                if (config.knownClickCount % 6 === 0) {
+                    config.knownProb = Math.max(0, config.knownProb - 10);
+                }
+            }
+
+            // Update UI
+            document.getElementById('balance').innerText = config.balance.toLocaleString();
+            document.getElementById('prob-display').innerText = config.knownProb;
+
+            // Advance Trial
+            if (config.trial < config.maxTrials) {
+                config.trial++;
+                document.getElementById('current-trial').innerText = config.trial;
+            } else {
+                endTask();
+            }
+        }
+
+        async function endTask() {
+            document.getElementById('screen3').classList.add('hidden');
+            document.getElementById('screen4').classList.remove('hidden');
+            document.getElementById('final-balance').innerText = "Final Balance: $" + config.balance.toLocaleString();
+
+            // Submit all data rows to the Google App Script
+            for (let entry of config.dataLog) {
+                try {
+                    await fetch(config.apiUrl, {
+                        method: "POST",
+                        mode: "no-cors", // Required for Apps Script Web Apps
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(entry)
+                    });
+                } catch (e) {
+                    console.error("Error sending trial " + entry.Trial_Number, e);
+                }
+            }
+            alert("Data submitted successfully.");
+        }
+    </script>
+</body>
+</html>
