@@ -5,83 +5,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Decision Making Task</title>
     <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f4f4f9; }
-        .container { text-align: center; background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 600px; width: 90%; position: relative; }
-        .hidden { display: none; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f0f2f5; }
+        .container { text-align: center; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 700px; width: 90%; position: relative; min-height: 400px; display: flex; flex-direction: column; justify-content: center; }
+        .hidden { display: none !important; }
         
-        /* Task Screen Specifics */
-        #money-display { position: absolute; top: 10px; right: 20px; font-weight: bold; font-size: 1.2rem; color: green; }
-        #trial-counter { position: absolute; top: 10px; left: 20px; font-size: 0.9rem; color: #666; }
-        .box-container { display: flex; justify-content: space-around; margin-top: 50px; }
-        .choice-box { width: 200px; height: 150px; display: flex; align-items: center; justify-content: center; border: 2px solid #333; border-radius: 8px; cursor: pointer; transition: transform 0.2s; background: #e0e0e0; font-weight: bold; padding: 10px; }
-        .choice-box:hover { transform: scale(1.05); background: #d0d0d0; }
+        /* Task UI */
+        #money-display { position: absolute; top: 20px; right: 30px; font-weight: bold; font-size: 1.4rem; color: #2e7d32; background: #e8f5e9; padding: 5px 15px; border-radius: 20px; }
+        #trial-counter { position: absolute; top: 20px; left: 30px; font-size: 1rem; color: #555; }
+        .box-container { display: flex; justify-content: space-around; gap: 20px; margin-top: 40px; }
         
-        button { padding: 10px 20px; font-size: 1rem; cursor: pointer; border-radius: 5px; border: none; background: #007bff; color: white; margin-top: 20px; }
-        input, select { padding: 8px; margin: 10px; width: 80%; }
+        .choice-box { 
+            width: 250px; height: 180px; display: flex; align-items: center; justify-content: center; 
+            border: 3px solid #333; border-radius: 15px; cursor: pointer; transition: all 0.2s ease; 
+            background: #fff; font-weight: bold; padding: 20px; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .choice-box:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); border-color: #007bff; }
+        .choice-box:active { transform: scale(0.98); }
+        
+        button { padding: 12px 30px; font-size: 1.1rem; cursor: pointer; border-radius: 8px; border: none; background: #007bff; color: white; margin-top: 25px; transition: background 0.2s; }
+        button:hover { background: #0056b3; }
+        input, select { padding: 12px; margin: 10px 0; width: 100%; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        
+        #feedback { height: 30px; margin-top: 20px; font-size: 1.2rem; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div id="screen1" class="container">
         <h1>Welcome</h1>
-        <input type="text" id="participantID" placeholder="Participant ID (Leave blank for random)">
+        <p>Please select your gender to begin.</p>
         <select id="gender">
             <option value="" disabled selected>Select Gender</option>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
-            <option value="Other">Other</option>
+            <option value="Non-binary">Non-binary</option>
             <option value="Prefer not to say">Prefer not to say</option>
         </select>
-        <br>
         <button onclick="startTask()">Start Task</button>
     </div>
 
     <div id="screen2" class="container hidden">
         <h2>Instructions</h2>
-        <p>You are about to complete a decision making task and you start with $100. In this task there will be 2 options, one with a known probability, and another with an unknown probability of winning. This unknown probability may have better or worse odds of receiving the reward.</p>
-        <p>If you win, your money will double. If you lose, your money will be cut in half. The goal at the end of this task is to have as much money as possible.</p>
+        <p style="line-height: 1.6; text-align: left;">
+            You are about to complete a decision making task and you start with <strong>$100</strong>. 
+            In this task there will be 2 options, one with a known probability, and another with an unknown probability of winning. 
+            This unknown probability may have better or worse odds of receiving the reward. 
+            <br><br>
+            If you win, your money will <strong>double</strong>. If you lose, your money will be <strong>cut in half</strong>. 
+            The goal at the end of this task is to have as much money as possible.
+        </p>
         <button onclick="showTask()">Continue</button>
     </div>
 
     <div id="screen3" class="container hidden">
         <div id="trial-counter">Trial: <span id="current-trial">1</span> / 30</div>
-        <div id="money-display">Balance: $<span id="balance">100</span></div>
+        <div id="money-display">$<span id="balance">100</span></div>
         <div class="box-container">
             <div id="known-box" class="choice-box" onclick="makeChoice('known')">
                 The probability of doubling your money: <span id="prob-display">70</span>%
             </div>
             <div id="ambig-box" class="choice-box" onclick="makeChoice('ambig')">
-                The probability of doubling your money: Unknown
+                The probability of doubling your money: unknown
             </div>
         </div>
-        <p id="feedback" style="margin-top: 20px; font-weight: bold;"></p>
+        <div id="feedback"></div>
     </div>
 
     <div id="screen4" class="container hidden">
         <h2>Task Complete</h2>
-        <p>Your data is being saved...</p>
-        <p id="final-balance"></p>
+        <p>Thank you for participating! Your data is being securely saved.</p>
+        <h3 id="final-total"></h3>
     </div>
 
     <script>
-        let config = {
-            participantID: "",
+        // Configuration and State
+        const state = {
+            participantID: "ID-" + Math.random().toString(36).substr(2, 9).toUpperCase(),
             gender: "",
             balance: 100,
             trial: 1,
             maxTrials: 30,
             knownProb: 70,
-            ambigProb: 60, // Secret prob
+            ambigProb: 60, // Secret internal probability
             knownClickCount: 0,
-            dataLog: [],
-            apiUrl: "https://script.google.com/macros/s/AKfycbxQn-tNA8dwEJEo9rWjBT5SYbGtdkc78_8LuEZ6EkPJSCX--4xKeN536_MH-XPKMnrlaQ/exec"
+            webAppUrl: "https://script.google.com/macros/s/AKfycbxQn-tNA8dwEJEo9rWjBT5SYbGtdkc78_8LuEZ6EkPJSCX--4xKeN536_MH-XPKMnrlaQ/exec"
         };
 
         function startTask() {
-            let idInput = document.getElementById('participantID').value;
-            config.participantID = idInput || "ID_" + Math.random().toString(36).substr(2, 6).toUpperCase();
-            config.gender = document.getElementById('gender').value || "Not Specified";
-            
+            const genderSelect = document.getElementById('gender');
+            if (!genderSelect.value) {
+                alert("Please select your gender.");
+                return;
+            }
+            state.gender = genderSelect.value;
             document.getElementById('screen1').classList.add('hidden');
             document.getElementById('screen2').classList.remove('hidden');
         }
@@ -91,74 +107,79 @@
             document.getElementById('screen3').classList.remove('hidden');
         }
 
-        function makeChoice(type) {
-            if (config.trial > config.maxTrials) return;
+        async function makeChoice(choiceType) {
+            if (state.trial > state.maxTrials) return;
 
-            let winRate = (type === 'known') ? config.knownProb : config.ambigProb;
-            let didWin = (Math.random() * 100) < winRate;
-            let choiceAmbig = (type === 'ambig') ? 1 : 0;
-            let currentKnownVal = config.knownProb;
+            // Determine win/loss
+            const currentKnownProb = state.knownProb;
+            const probability = (choiceType === 'known') ? state.knownProb : state.ambigProb;
+            const isWin = (Math.random() * 100) < probability;
 
-            // Update Money
-            if (didWin) {
-                config.balance *= 2;
-                document.getElementById('feedback').innerText = "Result: Win! Money Doubled.";
-                document.getElementById('feedback').style.color = "green";
+            // Update balance
+            if (isWin) {
+                state.balance *= 2;
+                showFeedback("WIN! Money Doubled", "#2e7d32");
             } else {
-                config.balance /= 2;
-                document.getElementById('feedback').innerText = "Result: Loss! Money Halved.";
-                document.getElementById('feedback').style.color = "red";
+                state.balance /= 2;
+                showFeedback("LOSS! Money Halved", "#d32f2f");
             }
 
-            // Record Data
-            config.dataLog.push({
-                Participant_ID: config.participantID,
-                Trial_Number: config.trial,
-                Ambiguous: choiceAmbig,
-                Risk: currentKnownVal,
-                Gender: config.gender
-            });
+            // Prepare Data Payload
+            const payload = {
+                Participant_ID: state.participantID,
+                Trial_Number: state.trial,
+                Ambiguous: (choiceType === 'ambig' ? 1 : 0),
+                Risk: currentKnownProb,
+                Gender: state.gender
+            };
 
-            // If known was clicked, update the counter and check for decay
-            if (type === 'known') {
-                config.knownClickCount++;
-                if (config.knownClickCount % 6 === 0) {
-                    config.knownProb = Math.max(0, config.knownProb - 10);
+            // Send data to Google Sheets (Fire and forget to keep task snappy)
+            sendData(payload);
+
+            // Logic for probability decay
+            if (choiceType === 'known') {
+                state.knownClickCount++;
+                if (state.knownClickCount % 6 === 0) {
+                    state.knownProb = Math.max(0, state.knownProb - 10);
                 }
             }
 
             // Update UI
-            document.getElementById('balance').innerText = config.balance.toLocaleString();
-            document.getElementById('prob-display').innerText = config.knownProb;
+            document.getElementById('balance').innerText = Math.round(state.balance);
+            document.getElementById('prob-display').innerText = state.knownProb;
 
             // Advance Trial
-            if (config.trial < config.maxTrials) {
-                config.trial++;
-                document.getElementById('current-trial').innerText = config.trial;
+            if (state.trial < state.maxTrials) {
+                state.trial++;
+                document.getElementById('current-trial').innerText = state.trial;
             } else {
-                endTask();
+                finishTask();
             }
         }
 
-        async function endTask() {
+        function showFeedback(text, color) {
+            const fb = document.getElementById('feedback');
+            fb.innerText = text;
+            fb.style.color = color;
+            // Clear feedback after a short delay
+            setTimeout(() => { if(fb.innerText === text) fb.innerText = ""; }, 1000);
+        }
+
+        function sendData(data) {
+            // Using fetch with 'no-cors' for Google Apps Script compatibility
+            fetch(state.webAppUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                cache: 'no-cache',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+        }
+
+        function finishTask() {
             document.getElementById('screen3').classList.add('hidden');
             document.getElementById('screen4').classList.remove('hidden');
-            document.getElementById('final-balance').innerText = "Final Balance: $" + config.balance.toLocaleString();
-
-            // Submit all data rows to the Google App Script
-            for (let entry of config.dataLog) {
-                try {
-                    await fetch(config.apiUrl, {
-                        method: "POST",
-                        mode: "no-cors", // Required for Apps Script Web Apps
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(entry)
-                    });
-                } catch (e) {
-                    console.error("Error sending trial " + entry.Trial_Number, e);
-                }
-            }
-            alert("Data submitted successfully.");
+            document.getElementById('final-total').innerText = "Final Balance: $" + Math.round(state.balance);
         }
     </script>
 </body>
