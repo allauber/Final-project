@@ -48,12 +48,7 @@
     <div id="screen2" class="container hidden">
         <h2>Instructions</h2>
         <p style="text-align: left; line-height: 1.6;">
-            You start with <strong>$100</strong>. You will choose between two options: 
-            one with a known probability and one with an unknown probability.
-            <br><br>
-            • <strong>Win:</strong> Money doubles. <br>
-            • <strong>Lose:</strong> Money is cut in half. <br><br>
-            Goal: Maximize your final balance. Your data is anonymous.
+            You are about to complete a decision making task and you start with $100. In this task there will be 2 options, one with a known probability, and another with an unknown probability of winning. This unknown probability may have better or worse odds of receiving the reward. If you win, your money will double. If you lose, your money will be cut in half. The goal at the end of this task is to have as much money as possible.
         </p>
         <button onclick="goToTask()">Continue</button>
     </div>
@@ -74,13 +69,13 @@
 
     <div id="screen4" class="container hidden">
         <h2>Task Complete</h2>
-        <p>Responses recorded. You may close this window.</p>
+        <p>Your responses have been recorded. Thank you for participating!</p>
         <h3 id="final-money"></h3>
     </div>
 
     <script>
         const appState = {
-            // GENERATED SILENTLY: Participant never sees this.
+            // Auto-generates ID: Participant never sees this.
             pid: "UID-" + Math.random().toString(36).substr(2, 8).toUpperCase(),
             gender: "",
             balance: 100,
@@ -124,7 +119,7 @@
                 updateFeedback("LOSS", "#dc2626");
             }
 
-            // Prepare row data
+            // Data Payload
             const rowData = {
                 Participant_ID: appState.pid,
                 Trial_Number: appState.currentTrial,
@@ -133,14 +128,14 @@
                 Gender: appState.gender
             };
 
-            // Send to Google Sheets
+            // Post to Google Script
             fetch(appState.scriptUrl, {
                 method: 'POST',
                 mode: 'no-cors',
                 body: JSON.stringify(rowData)
             });
 
-            // Decay logic: every 4 clicks on "Known"
+            // Known Probability Decay: every 4 clicks on "Known" box
             if (isKnown) {
                 appState.knownClicks++;
                 if (appState.knownClicks % 4 === 0) {
@@ -170,7 +165,7 @@
         function finish() {
             document.getElementById('screen3').classList.add('hidden');
             document.getElementById('screen4').classList.remove('hidden');
-            document.getElementById('final-money').innerText = "Total: $" + Math.round(appState.balance);
+            document.getElementById('final-money').innerText = "Final Balance: $" + Math.round(appState.balance);
         }
     </script>
 </body>
