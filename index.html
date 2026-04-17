@@ -6,15 +6,15 @@
     <title>Decision Making Task</title>
     <style>
         :root {
-            --primary: #2563eb;
-            --success: #16a34a;
-            --danger: #dc2626;
-            --bg: #f8fafc;
-            --text: #1e293b;
+            --primary: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg: #f1f5f9;
+            --text: #0f172a;
         }
 
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            font-family: 'Inter', -apple-system, sans-serif; 
             background-color: var(--bg); 
             color: var(--text);
             display: flex; 
@@ -27,8 +27,8 @@
         .container { 
             background: white; 
             padding: 40px; 
-            border-radius: 16px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+            border-radius: 12px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
             max-width: 650px; 
             width: 90%; 
             text-align: center; 
@@ -37,17 +37,17 @@
 
         .hidden { display: none !important; }
         
-        /* Stats & Header */
+        /* Dashboard */
         #money-display { 
             position: absolute; 
             top: 20px; 
             right: 30px; 
-            font-size: 1.5rem; 
-            font-weight: bold; 
+            font-size: 1.4rem; 
+            font-weight: 700; 
             color: var(--success); 
-            background: #f0fdf4; 
-            padding: 5px 15px; 
-            border-radius: 30px; 
+            background: #ecfdf5; 
+            padding: 6px 16px; 
+            border-radius: 20px; 
         }
 
         #trial-info { 
@@ -55,13 +55,13 @@
             top: 25px; 
             left: 30px; 
             color: #64748b; 
-            font-size: 1rem; 
+            font-weight: 500;
         }
         
-        /* Task Boxes */
+        /* Interaction Boxes */
         .box-container { 
             display: flex; 
-            gap: 25px; 
+            gap: 20px; 
             justify-content: center; 
             margin-top: 60px; 
         }
@@ -75,7 +75,7 @@
             align-items: center; 
             justify-content: center; 
             cursor: pointer; 
-            transition: all 0.2s ease; 
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
             background: #fff; 
             padding: 20px; 
             font-weight: 600; 
@@ -85,41 +85,44 @@
 
         .box:hover { 
             border-color: var(--primary); 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
-            transform: translateY(-2px); 
+            background: #f8faff;
+            transform: translateY(-4px); 
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
 
-        .box:active { transform: scale(0.98); background: #eff6ff; }
+        .box:active { transform: scale(0.97); }
 
-        /* Form Elements */
+        /* Form Inputs */
         button { 
             background-color: var(--primary); 
             color: white; 
             border: none; 
-            padding: 14px 28px; 
-            border-radius: 8px; 
+            padding: 12px 24px; 
+            border-radius: 6px; 
             cursor: pointer; 
-            font-size: 1.1rem; 
+            font-size: 1rem; 
+            font-weight: 600;
             margin-top: 25px; 
         }
 
-        button:hover { background-color: #1d4ed8; }
+        button:hover { background-color: #2563eb; }
 
         select { 
             padding: 12px; 
             margin: 20px 0; 
             width: 100%; 
-            max-width: 300px; 
+            max-width: 320px; 
             border: 1px solid #cbd5e0; 
             border-radius: 8px; 
             font-size: 1rem;
+            background-color: white;
         }
         
         #feedback { 
             margin-top: 25px; 
-            font-weight: bold; 
-            font-size: 1.3rem; 
-            min-height: 1.6rem; 
+            font-weight: 700; 
+            font-size: 1.2rem; 
+            min-height: 1.5rem; 
         }
     </style>
 </head>
@@ -127,7 +130,7 @@
 
     <div id="screen1" class="container">
         <h1>Welcome</h1>
-        <p>Please select your gender to begin.</p>
+        <p>Please select your gender to begin the task.</p>
         <select id="gender">
             <option value="" disabled selected>Select Gender</option>
             <option value="Male">Male</option>
@@ -136,26 +139,26 @@
             <option value="Prefer not to say">Prefer not to say</option>
         </select>
         <br>
-        <button onclick="goToInstructions()">Start Task</button>
+        <button onclick="startApp()">Start Task</button>
     </div>
 
     <div id="screen2" class="container hidden">
         <h2>Instructions</h2>
-        <p style="text-align: left; line-height: 1.7;">
-            You are about to complete a decision making task and you start with $100. In this task there will be 2 options, one with a known probability, and another with an unknown probability of winning. This unknown probability may have better or worse odds of receiving the reward. If you win, your money will double. If you lose, your money will be cut in half. The goal at the end of this task is to have as much money as possible. Your responses will be anonymous.
+        <p style="text-align: left; line-height: 1.7; font-size: 1.05rem;">
+            You are about to complete a decision making task and you start with $100. In this task there will be 2 options, one with a known probability, and another with an unknown probability of winning. This unknown probability may have better or worse odds of receiving the reward. If you win, your money will double. If you lose, your money will be cut in half. The goal at the end of this task is to have as much money as possible. Your responses will be recorded anonymously.
         </p>
-        <button onclick="goToTask()">Continue</button>
+        <button onclick="showTask()">Continue</button>
     </div>
 
     <div id="screen3" class="container hidden">
-        <div id="trial-info">Trial <span id="trial-num">1</span> / 30</div>
+        <div id="trial-info">Trial <span id="trial-num">1</span> of 30</div>
         <div id="money-display">$<span id="balance">100</span></div>
         <div class="box-container">
             <div class="box" onclick="handleChoice('known')">
                 The probability of doubling your money: <span id="known-val">70</span>%
             </div>
             <div class="box" onclick="handleChoice('ambig')">
-                The probability of doubling your money: unknown
+                The probability of doubling your money: Unknown
             </div>
         </div>
         <div id="feedback"></div>
@@ -163,91 +166,87 @@
 
     <div id="screen4" class="container hidden">
         <h2>Task Complete</h2>
-        <p>Your responses have been recorded. Thank you for your participation!</p>
+        <p>Your responses have been recorded anonymously. Thank you for your time!</p>
         <h3 id="final-money"></h3>
     </div>
 
     <script>
-        const appState = {
-            // Generates a unique ID automatically upon loading
-            pid: "UID-" + Math.random().toString(36).substr(2, 9).toUpperCase(),
+        const state = {
+            // Internal ID generated silently for your spreadsheet
+            pid: "UID-" + Math.random().toString(36).substring(2, 10).toUpperCase(),
             gender: "",
             balance: 100,
-            currentTrial: 1,
+            trial: 1,
             maxTrials: 30,
             knownProb: 70,
-            ambigProb: 60, // Hidden win rate
-            knownClicks: 0,
-            scriptUrl: "https://script.google.com/macros/s/AKfycbxQn-tNA8dwEJEo9rWjBT5SYbGtdkc78_8LuEZ6EkPJSCX--4xKeN536_MH-XPKMnrlaQ/exec"
+            ambigProb: 60, // Secret constant probability
+            knownClickCount: 0,
+            endpoint: "https://script.google.com/macros/s/AKfycbxQn-tNA8dwEJEo9rWjBT5SYbGtdkc78_8LuEZ6EkPJSCX--4xKeN536_MH-XPKMnrlaQ/exec"
         };
 
-        function goToInstructions() {
-            const genderSelect = document.getElementById('gender');
-            if (!genderSelect.value) {
-                alert("Please select your gender.");
-                return;
-            }
-            appState.gender = genderSelect.value;
+        function startApp() {
+            const g = document.getElementById('gender').value;
+            if (!g) { alert("Please select your gender."); return; }
+            state.gender = g;
             document.getElementById('screen1').classList.add('hidden');
             document.getElementById('screen2').classList.remove('hidden');
         }
 
-        function goToTask() {
+        function showTask() {
             document.getElementById('screen2').classList.add('hidden');
             document.getElementById('screen3').classList.remove('hidden');
         }
 
         function handleChoice(type) {
-            if (appState.currentTrial > appState.maxTrials) return;
+            if (state.trial > state.maxTrials) return;
 
             const isKnown = (type === 'known');
-            const riskValueAtChoice = appState.knownProb;
-            const winProb = isKnown ? appState.knownProb : appState.ambigProb;
-            
-            // Calculate outcome
-            const isWin = (Math.random() * 100) < winProb;
+            const currentKnownVal = state.knownProb;
+            const prob = isKnown ? state.knownProb : state.ambigProb;
+            const win = (Math.random() * 100) < prob;
 
-            if (isWin) {
-                appState.balance *= 2;
-                updateFeedback("WIN! Money Doubled", "#16a34a");
+            // Logic: Double or Half
+            if (win) {
+                state.balance *= 2;
+                updateFeedback("WIN! Money Doubled", "#10b981");
             } else {
-                appState.balance /= 2;
-                updateFeedback("LOSS! Money Halved", "#dc2626");
+                state.balance /= 2;
+                updateFeedback("LOSS! Money Halved", "#ef4444");
             }
 
-            // Record Data
-            const rowData = {
-                Participant_ID: appState.pid,
-                Trial_Number: appState.currentTrial,
+            // Data Transmission
+            const payload = {
+                Participant_ID: state.pid,
+                Trial_Number: state.trial,
                 Ambiguous: isKnown ? 0 : 1,
-                Risk: riskValueAtChoice,
-                Gender: appState.gender
+                Risk: currentKnownVal,
+                Gender: state.gender
             };
 
-            // Post data to Google Apps Script
-            fetch(appState.scriptUrl, {
+            // Using no-cors to interact with Google Apps Script silently
+            fetch(state.endpoint, {
                 method: 'POST',
                 mode: 'no-cors',
-                body: JSON.stringify(rowData)
+                body: JSON.stringify(payload)
             });
 
-            // Handle Probability Decay (Every 4 clicks on the Known box)
+            // Decay Logic: Every 4 clicks on the "Known" box
             if (isKnown) {
-                appState.knownClicks++;
-                if (appState.knownClicks % 4 === 0) {
-                    appState.knownProb = Math.max(0, appState.knownProb - 10);
+                state.knownClickCount++;
+                if (state.knownClickCount % 4 === 0) {
+                    state.knownProb = Math.max(0, state.knownProb - 10);
                 }
             }
 
-            // Update UI
-            document.getElementById('balance').innerText = Math.round(appState.balance).toLocaleString();
-            document.getElementById('known-val').innerText = appState.knownProb;
+            // UI Updates
+            document.getElementById('balance').innerText = Math.round(state.balance).toLocaleString();
+            document.getElementById('known-val').innerText = state.knownProb;
 
-            if (appState.currentTrial < appState.maxTrials) {
-                appState.currentTrial++;
-                document.getElementById('trial-num').innerText = appState.currentTrial;
+            if (state.trial < state.maxTrials) {
+                state.trial++;
+                document.getElementById('trial-num').innerText = state.trial;
             } else {
-                setTimeout(finishTask, 1000);
+                setTimeout(endTask, 800);
             }
         }
 
@@ -255,14 +254,13 @@
             const fb = document.getElementById('feedback');
             fb.innerText = msg;
             fb.style.color = color;
-            // Clear message after 800ms
-            setTimeout(() => { if(fb.innerText === msg) fb.innerText = ""; }, 800);
+            setTimeout(() => { if(fb.innerText === msg) fb.innerText = ""; }, 700);
         }
 
-        function finishTask() {
+        function endTask() {
             document.getElementById('screen3').classList.add('hidden');
             document.getElementById('screen4').classList.remove('hidden');
-            document.getElementById('final-money').innerText = "Final Total: $" + Math.round(appState.balance).toLocaleString();
+            document.getElementById('final-money').innerText = "Final Total: $" + Math.round(state.balance).toLocaleString();
         }
     </script>
 </body>
